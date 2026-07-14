@@ -1,14 +1,25 @@
+import express from 'express';
+import { Login, Logout, Register, updateProfile, CheckAuth } from '../controllers/Auth.js';
+import { upload } from '../middleware/Multer.js';
+import { isLogin } from '../middleware/CheckAdmin.js'; 
 
-import express from 'express'
-import { Login, Logout, Register, updateProfile } from '../controllers/Auth.js'
-import { upload } from '../middleware/Multer.js'
-import { isLogin } from '../middleware/CheckAdmin.js'
+const AuthRoutes = express.Router();
 
-const AuthRoutes=express.Router()
+// ==========================================
+// POST ROUTES
+// ==========================================
+AuthRoutes.post('/register', upload.single('profile'), Register);
+AuthRoutes.post('/login', Login);
+AuthRoutes.post('/logout', Logout);
 
+// ==========================================
+// GET ROUTES
+// ==========================================
+AuthRoutes.get('/checkauth', isLogin, CheckAuth);
 
-AuthRoutes.post('/register',upload.single('profile'),Register)
-AuthRoutes.post('/login',Login)
-AuthRoutes.patch('/profile/:id',upload.single('profile'),isLogin,updateProfile)
-AuthRoutes.post('/logout',Logout)
-export default AuthRoutes
+// ==========================================
+// PATCH ROUTES
+// ==========================================
+AuthRoutes.patch('/profile/:id', isLogin, upload.single('profile'), updateProfile);
+
+export default AuthRoutes;

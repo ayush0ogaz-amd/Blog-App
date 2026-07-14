@@ -1,67 +1,52 @@
-
-
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 import UserModal from '../models/User.js';
 
-const isAdmin = async (req, res, next) => {
-    try {
-        const token = req.cookies.token;
-
-        if (!token) {
-            
-            return res.status(401).json({ message: 'Unauthorized: No token provided' });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        console.log('Decoded token:', decoded); // Log decoded token payload
-
-        const user = await UserModal.findById(decoded.userId);
-        console.log('User:', user); // Log user object retrieved from the database
-
-        if (!user) {
-            return res.status(403).json({ message: 'Unauthorized: User not found' });
-        }
-
-        if (user.role !== 'admin') {
-            return res.status(403).json({ message: 'Unauthorized: User is not an admin' });
-        }
-
-        req.user = user;
-        next();
-    } catch (error) {
-        console.error('Error verifying token:', error);
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-    }
-};
+// ==========================================
+// MIDDLEWARE 1: USER AUTHENTICATION GUARD
+// ==========================================
 const isLogin = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        const token = req.cookies?.token;
 
         if (!token) {
-            
-            return res.status(401).json({ message: 'Unauthorized: Please Login ' });
+            return res.status(401).json({ success: false, message: 'Unauthorized: Please Login' });
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        console.log('Decoded token:', decoded); // Log decoded token payload
-
-        const user = await UserModal.findById(decoded.userId);
-        console.log('User:', user);
+        const user = await UserModal.findById(decoded.userId).select('-password');
 
         if (!user) {
-            return res.status(403).json({ message: 'Unauthorized: User not found' });
+            return res.status(401).json({ success: false, message: 'Unauthorized: User account no longer exists' });
         }
-
 
         req.user = user;
         next();
     } catch (error) {
-        console.error('Error verifying token:', error);
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ success: false, message: 'Session expired. Please login again.' });
+        }
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ success: false, message: 'Invalid token structure.' });
+        }
+        
+        console.error('Unexpected Auth Middleware Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal Server Error during validation' });
     }
 };
 
+// ==========================================
+// MIDDLEWARE 2: ADMINISTRATOR ROUTE GUARD
+// ==========================================
+const isAdmin = async (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: Complete authentication verification first' });
+    }
 
-export {isAdmin,isLogin}
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Forbidden: Access restricted to administrators only' });
+    }
+
+    next();
+};
+
+export { isAdmin, isLogin };

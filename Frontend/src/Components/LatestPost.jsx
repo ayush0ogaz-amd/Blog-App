@@ -1,67 +1,97 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { BaseUrl, get } from '../services/Endpoint';
+import React from "react";
+import {useNavigate} from "react-router-dom";
 
-export default function LatestPost() {
-    const navigation = useNavigate();
 
-    const handleBlog = (id) => {
-        navigation(`/blog/${id}`);
-    };
+export default function LatestPost({posts}){
 
-    const [blogs, setBlogs] = useState([]);
 
-    useEffect(() => {
-        const fetchBlogs = async () => {
-            try {
-                const request = await get('/blog/GetPosts');
-                const response = request.data;
-                setBlogs(response.posts);
-                console.log('blogs', response);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        fetchBlogs();
-    }, []);
+const navigate = useNavigate();
 
-    // Helper function to truncate text to a specific number of words
-    const truncateText = (text, wordLimit) => {
-        const words = text.split(' ');
-        if (words.length > wordLimit) {
-            return words.slice(0, wordLimit).join(' ') + '...';
-        }
-        return text;
-    };
 
-    return (
-        <>
-            <div className="container">
-                <div className='mb-5 text-center'>
-                    <h2 className="fw-bold fs-1 text-white">Recent Posts</h2>
-                </div>
-                <div className="row">
-                    {blogs && blogs.map((elem) => {
-                        return (
-                            <div className="col-md-4 mb-4" key={elem._id}>
-                                <div className="card border-success" style={{ borderWidth: "2px", backgroundColor: "#2b2b2b", borderRadius: "10px", overflow: "hidden" }}>
-                                    <img 
-                                        src={`${BaseUrl}/images/${elem.image}`} 
-                                        className="card-img-top img-fluid" 
-                                        alt="Blog Post 1" 
-                                        style={{ height: "200px", objectFit: "cover" }} 
-                                    />
-                                    <div className="card-body bg-dark text-white">
-                                        <h5 className="card-title">{elem.title}</h5>
-                                        <p className="card-text">{truncateText(elem.desc, 20)}</p>
-                                        <button className="btn btn-primary w-100 mt-3" onClick={() => handleBlog(elem._id)}>Read Article</button>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        </>
-    );
+
+const truncate=(text)=>{
+
+return text.length>120 
+? text.substring(0,120)+"..."
+: text;
+
+}
+
+
+
+return(
+
+<div className="container">
+
+
+<h2 className="section-title">
+Latest Posts
+</h2>
+
+
+
+<div className="row">
+
+
+{
+posts.map((blog)=>(
+
+
+<div 
+className="col-lg-4 col-md-6 mb-4"
+key={blog._id}
+>
+
+
+<div className="blog-card">
+
+
+<img
+src={blog.image}
+alt={blog.title}
+/>
+
+
+
+<div className="card-content">
+
+
+<h3>
+{blog.title}
+</h3>
+
+
+<p>
+{truncate(blog.desc)}
+</p>
+
+
+<button
+onClick={()=>navigate(`/blog/${blog._id}`)}
+>
+Read More
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+))
+}
+
+
+</div>
+
+
+</div>
+
+)
+
 }

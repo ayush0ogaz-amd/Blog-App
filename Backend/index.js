@@ -11,26 +11,46 @@ import PublicRoutes from './routes/Public.js'
 
 dotenv.config()
 
-const PORT=process.env.PORT || 4000
-const app=express()
+const PORT = process.env.PORT || 4000
+const app = express()
+
+// ==========================================
+// DATABASE CONFIGURATION
+// ==========================================
 DBCon()
+
+// ==========================================
+// CORE GLOBAL MIDDLEWARES
+// ==========================================
 app.use(express.json())
-app.get('/',(req,res)=>{
-    res.send('hello from server')
-})
 app.use(express.static('public'))
 app.use(cookieParser())
-const corsOptoins={
-    origin:true,
-    credentials:true
-}
-app.use(cors(corsOptoins))
-app.use('/auth',AuthRoutes)
-app.use('/blog',BlogRoutes)
-app.use('/dashboard',DashboardRoutes)
-app.use('/comment',CommentRoutes)
-app.use('/public',PublicRoutes)
 
-app.listen(PORT,()=>{
+const corsOptions = {
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173', 
+    credentials: true
+}
+app.use(cors(corsOptions))
+
+// ==========================================
+// TEST SERVER ROUTE
+// ==========================================
+app.get('/', (req, res) => {
+    res.send('hello from server')
+})
+
+// ==========================================
+// API SYSTEM ROUTING MODULES
+// ==========================================
+app.use('/auth', AuthRoutes)
+app.use('/blog', BlogRoutes)
+app.use('/dashboard', DashboardRoutes)
+app.use('/comment', CommentRoutes)
+app.use('/public', PublicRoutes)
+
+// ==========================================
+// INITIALIZE HTTP SERVER LISTENER
+// ==========================================
+app.listen(PORT, () => {
     console.log(`App is running on Port ${PORT}`)
 })

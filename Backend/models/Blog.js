@@ -1,23 +1,11 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const BlogSchema=new mongoose.Schema({
-    title:{
-        type:String,
-    },
-    desc:{
-        type:String,
-    },
-    image:{
-        type:String,
-    },
-    comments: [{ 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Comment'
-    }]
-},{
-    timestamps:String
-})
+const blogSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  desc: { type: String, required: true },
+  image: { type: String, required: true },
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]
+}, { timestamps: true });
 
-const Blgomodel= mongoose.model("Posts",BlogSchema)
-
-export default Blgomodel
+const BlogModel = mongoose.model('Blog', blogSchema);
+export default BlogModel;

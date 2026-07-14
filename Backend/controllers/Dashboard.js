@@ -1,66 +1,79 @@
-import Blgomodel from "../models/Blog.js"
-import CommentModel from "../models/Commments.js"
-import UserModal from "../models/User.js"
-import fs from 'fs';
-import path from 'path';
+import BlogModel from "../models/Blog.js";
+import CommentModel from "../models/Comments.js";
+import UserModal from "../models/User.js";
+import { v2 as cloudinary } from 'cloudinary';
 
-const Dashboard=async(req,res)=>{
+// ==========================================
+// ROUTE HANDLER 1: GET DASHBOARD STATS
+// ==========================================
+const Dashboard = async (req, res) => {
     try {
-        const Users= await UserModal.find()
-        const Posts= await Blgomodel.find()
-        const comments= await CommentModel.find()
+        const [userCount, postCount, commentCount] = await Promise.all([
+            UserModal.countDocuments(),
+            BlogModel.countDocuments(),
+            CommentModel.countDocuments()
+        ]);
 
-        if (!Users && !Posts && !comments) {
-            return res.status(404).json({success:false,message:"Not Data Found"})
-        }
-   res.status(200).json({success:true,Users,Posts,comments})
-
+        res.status(200).json({
+            success: true,
+            counts: {
+                users: userCount,
+                posts: postCount,
+                comments: commentCount
+            }
+        });
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({success:false,message:"Internal server error"})
-
+        console.error("Dashboard calculation error:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
-const GetUsers=async(req,res)=>{
+};
+
+// ==========================================
+// ROUTE HANDLER 2: GET ALL USERS LIST
+// ==========================================
+const GetUsers = async (req, res) => {
     try {
-        const Users= await UserModal.find()
-        if (!Users) {
-            res.status(404).json({success:false,message:"No Data Found"})
+        const Users = await UserModal.find().select('-password');
+        
+        if (Users.length === 0) {
+            return res.status(404).json({ success: false, message: "No Users Found" });
         }
-   res.status(200).json({success:true,Users})
-
+        res.status(200).json({ success: true, Users });
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({success:false,message:"Internal server error"})
+        console.error("GetUsers error:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
-const Delete=async(req,res)=>{
-    try {
-        const userId= req.params.id
+};
 
-        const ExistUser=await UserModal.findById(userId)
+// ==========================================
+// ROUTE HANDLER 3: DELETE USER ACCOUNT
+// ==========================================
+const Delete = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        const ExistUser = await UserModal.findById(userId);
         if (!ExistUser) {
-           return res.status(404).json({success:false,message:"No User Found"})
-            
+            return res.status(404).json({ success: false, message: "No User Found" });
         }
-        if (ExistUser.role == 'admin') {
-           return res.status(404).json({success:false,message:"Soory Your Admin You Can't Delete You Account"})
-            
+        
+        if (ExistUser.role === 'admin') {
+            return res.status(403).json({ success: false, message: "Sorry, you are an Admin. You cannot delete your account." });
         }
-           // Delete the user's profile image if it exists
-           if (ExistUser.profile) {
-            const profilePath = path.join('public/images', ExistUser.profile);
-            fs.promises.unlink(profilePath)
-                .then(() => console.log('Profile image deleted'))
-                .catch(err => console.error('Error deleting profile image:', err));
-        }
-       const DeleteUser= await UserModal.findByIdAndDelete(userId)
-   res.status(200).json({success:true,message:"user Deleted Successfully",User:DeleteUser})
 
+        if (ExistUser.profile) {
+            const publicId = ExistUser.profile.split('/').pop().split('.');
+            await cloudinary.uploader.destroy(publicId).catch(err => 
+                console.error('Cloudinary user profile removal failure:', err.message)
+            );
+        }
+
+        const DeleteUser = await UserModal.findByIdAndDelete(userId).select('-password');
+        res.status(200).json({ success: true, message: "User Deleted Successfully", User: DeleteUser });
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({success:false,message:"Internal server error"}) 
+        console.error("Delete user error:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" }); 
     }
-}
+};
 
-export {Dashboard,GetUsers,Delete}
+export { Dashboard, GetUsers, Delete };

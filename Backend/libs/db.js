@@ -1,13 +1,20 @@
+
 import mongoose from "mongoose";
 
 
-const DBCon=async()=>{
+const DBCon = async () => {
     try {
-          mongoose.connect(process.env.MONGDB_ULR)
-          console.log('MONGODB IS CONNECTED')
+        // Establishes a secure connection handshake to your local or cloud MongoDB cluster
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log('MONGODB IS CONNECTED SUCCESSFULLY');
     } catch (error) {
-        console.log(error)
+        
+        console.error('MongoDB Connection Error:', error.message);
+        
+        
+        process.exit(1); 
     }
 }
 
-export default DBCon
+export default DBCon;
+
