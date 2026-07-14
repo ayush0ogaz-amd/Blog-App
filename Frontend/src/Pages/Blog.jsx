@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { BaseUrl, get, post } from '../services/Endpoint';
+import { get, imageUrl, post } from '../services/Endpoint';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 
@@ -35,7 +35,6 @@ export default function Blog() {
         const request = await post("/comment/addcomment", {
           comment,
           postId,
-          userId: user._id,
         });
         const response = request.data;
         console.log(response);
@@ -62,9 +61,9 @@ export default function Blog() {
     <div className="container text-white mt-5 mb-5">
       <div className="row">
         <div className="col-md-12">
-          <h1 className="fw-bold text-white mb-4 display-4">{post && post.title}</h1>
+          <h1 className="fw-bold text-white mb-4 display-4">{singlePost?.title}</h1>
           <img 
-            src={singlePost && `${BaseUrl}/images/${singlePost.image}`} 
+            src={imageUrl(singlePost?.image)}
             alt="Exploring the Art of Writing" 
             className="img-fluid mb-4" 
             style={{ borderRadius: "10px", maxHeight: "500px", objectFit: "cover", width: "100%" }}
@@ -96,13 +95,13 @@ export default function Blog() {
           return(
             <div className="bg-secondary p-3 rounded mb-3 d-flex">
             <img 
-             src={`${BaseUrl}/images/${elem.userId.profile}`}
+             src={imageUrl(elem.userId?.profile)}
               alt="John Doe" 
               className="rounded-circle me-3"
               style={{ width: "50px", height: "50px", objectFit: "cover" }}
             />
             <div>
-              <h5 className="mb-1">{elem.userId.FullName}</h5>
+              <h5 className="mb-1">{elem.userId?.FullName}</h5>
               <p className="mb-0">{elem.comment}</p>
             </div>
           </div>

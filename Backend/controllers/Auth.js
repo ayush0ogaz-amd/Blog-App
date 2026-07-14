@@ -156,7 +156,11 @@ const updateProfile = async (req, res) => {
     let localFilePath = null;
     try {
         const userId = req.params.id;
-        const { FullName, password } = req.body;
+        const { FullName, password, currentPassword } = req.body;
+
+        if (req.user._id.toString() !== userId) {
+            return res.status(403).json({ success: false, message: "You can only update your own profile" });
+        }
 
         const user = await UserModal.findById(userId);
         if (!user) {
@@ -169,6 +173,9 @@ const updateProfile = async (req, res) => {
         if (FullName) user.FullName = FullName;
         
         if (password) {
+            if (!currentPassword || !(await bcrypt.compare(currentPassword, user.password))) {
+                return res.status(400).json({ success: false, message: "Your current password is incorrect" });
+            }
             user.password = await bcrypt.hash(password, 10);
         }
 

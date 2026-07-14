@@ -16,6 +16,8 @@ import { persistor, store } from './redux/store'
 import { PersistGate } from 'redux-persist/integration/react'
 import { Toaster } from 'react-hot-toast'
 import Profile from './Pages/Profile'
+import NotFound from './Pages/NotFound'
+import AuthSession from './Components/AuthSession'
 
 export default function App() {
   return (
@@ -24,6 +26,7 @@ export default function App() {
       <Provider store={store}>
         {/* Fixed the variable name here to match the corrected import */}
         <PersistGate loading={null} persistor={persistor}>
+          <AuthSession />
           <Routes>
             {/* User Facing Routes */}
             <Route path='/' element={<UserLayout />}>
@@ -43,6 +46,7 @@ export default function App() {
             {/* Auth Routes */}
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
+            <Route path='*' element={<NotFound />} />
           </Routes>
         </PersistGate>
       </Provider>

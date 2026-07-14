@@ -1,25 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
-import { delet, get } from '../../services/Endpoint';
+import { del, get } from '../../services/Endpoint';
 import toast from 'react-hot-toast';
 
 export default function User() {
   const [Users,setUsers]=useState([])
   const [loadedata,setLoadedata]=useState(false)
-  const users = [
-    { id: 1, name: 'John Doe', email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-    { id: 3, name: 'Michael Brown', email: 'michael@example.com' },
-    // Add more users as needed
-  ];
-
   const handleDelete = async (userId) => {
     // Display a confirmation dialog
     const confirmed = window.confirm('Are you sure you want to delete this user?');
   
     if (confirmed) {
       try {
-        const response = await delet(`/dashboard/delete/${userId}`);
+        const response = await del(`/dashboard/delete/${userId}`);
         const data = response.data;
   
         if (data.success) {
@@ -69,7 +62,7 @@ export default function User() {
           </thead>
           <tbody>
             {Users && Users.map((user, index) => (
-              <tr key={user.id}>
+              <tr key={user._id}>
                 <th scope="row">{index + 1}</th>
                 <td>{user.FullName}</td>
                 <td>{user.email}</td>

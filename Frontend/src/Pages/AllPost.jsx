@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaTrashAlt, FaEdit } from 'react-icons/fa';
-import { BaseUrl, delet, get } from '../services/Endpoint';
+import { del, get, imageUrl } from '../services/Endpoint';
 import toast from 'react-hot-toast';
 
 export default function AllPost() {
@@ -14,7 +14,7 @@ export default function AllPost() {
   
     if (confirmed) {
       try {
-        const response = await delet(`/blog/delete/${postId}`);
+        const response = await del(`/blog/delete/${postId}`);
         const data = response.data;
 
         if (data.success) {
@@ -63,7 +63,7 @@ export default function AllPost() {
           <div className="col-md-4 mb-4" key={post._id}>
             <div className="card h-100 shadow-sm">
               {/* Fixed: Swapped out local static paths for Cloudinary URL delivery directly */}
-              <img src={post.image} className="card-img-top" alt={post.title} style={{ height: '200px', objectFit: 'cover' }} />
+              <img src={imageUrl(post.image)} className="card-img-top" alt={post.title} style={{ height: '200px', objectFit: 'cover' }} />
               <div className="card-body">
                 <h5 className="card-title">{post.title}</h5>
                 {/* Fixed: Replaced post.description with post.desc matching your database schema */}

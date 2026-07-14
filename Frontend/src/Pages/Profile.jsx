@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaUser, FaLock, FaCamera } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { BaseUrl, patch } from '../services/Endpoint';
+import { imageUrl, patch } from '../services/Endpoint';
 import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { setUser } from '../redux/AuthSlice';
@@ -32,15 +32,17 @@ setName(user.FullName)
     e.preventDefault();
     const formData= new FormData();
     formData.append('FullName',name)
-    formData.append('oldpassword',oldPassword)
-    formData.append('newpassword',newPassword)
+    if (newPassword) {
+      formData.append('currentPassword', oldPassword)
+      formData.append('password', newPassword)
+    }
     if (profileImage) {
         formData.append('profile',profileImage)
         
 
     }
     try {
-        const resposne= await patch(`auth/profile/${userId}`,formData)
+        const resposne= await patch(`/auth/profile/${userId}`,formData)
         const data=resposne.data
         console.log(data)
         if (resposne.status==200) {
@@ -70,7 +72,7 @@ setName(user.FullName)
             ) : (
               <div className="profile-placeholder">
                 {/* <FaUser className="profile-icon" /> */}
-                <img src={`${BaseUrl}/images/${user.profile}`} alt='Avatar'  className="profile-image" />
+                {user?.profile ? <img src={imageUrl(user.profile)} alt="Avatar" className="profile-image" /> : <FaUser className="profile-icon" />}
               </div>
             )}
             <FaCamera className="profile-camera-icon" />

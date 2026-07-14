@@ -3,10 +3,11 @@ import CommentModel from "../models/Comments.js"; // Standardized file name nami
 
 const AddComment = async (req, res) => {
     try {
-        const { postId, userId, comment } = req.body;
+        const { postId, comment } = req.body;
+        const userId = req.user._id;
 
         // 1. Validate required fields explicitly
-        if (!postId || !userId || !comment) {
+        if (!postId || !comment?.trim()) {
             return res.status(400).json({ success: false, message: 'All fields are required.' });
         }
 
@@ -20,7 +21,7 @@ const AddComment = async (req, res) => {
         const newComment = new CommentModel({
             postId,
             userId,
-            comment
+            comment: comment.trim()
         });
         await newComment.save();
 

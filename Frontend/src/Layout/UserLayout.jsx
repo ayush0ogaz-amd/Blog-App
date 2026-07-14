@@ -1,6 +1,7 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 import Navbar from '../Components/Navbar'
+import Footer from '../Components/Footer'
 
 export default function UserLayout() {
   return (
@@ -13,7 +14,8 @@ export default function UserLayout() {
       {/* ==========================================
           NESTED USER ROUTE COMPONENT VIEWPORT
          ========================================== */}
-      <Outlet />
+      <main className="site-main"><Outlet /></main>
+      <Footer />
     </>
   )
 }

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function Sidebar() {
   return (
-    <div className="bg-dark text-white vh-100" style={{ width: '250px' }}>
+    <aside className="dashboard-sidebar" aria-label="Dashboard navigation">
       <div className="p-3">
         {/* ==========================================
             ADMIN NAVIGATION LINKS STREAM
@@ -32,6 +32,6 @@ export default function Sidebar() {
           </li>
         </ul>
       </div>
-    </div>
+    </aside>
   );
 }

@@ -75,9 +75,6 @@ const GetPosts = async (req, res) => {
     try {
         const posts = await BlogModel.find();
        
-        if (posts.length === 0) {
-            return res.status(404).json({ success: false, message: 'No blogs found' });
-        }
         res.status(200).json({ success: true, posts });
     } catch (error) {
         console.error("Error fetching blogs:", error);
