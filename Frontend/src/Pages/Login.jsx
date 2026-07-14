@@ -49,7 +49,7 @@ export default function Login() {
                 <div className="container d-flex flex-column align-items-center justify-content-center min-vh-100 py-4">
                     <a href="#" className="mb-4 text-dark text-decoration-none d-flex align-items-center">
                         <img className="me-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo" width="32" height="32" />
-                        <Link to={'/'}> <span className="h4 mb-0 fw-bold">CodeByZahid</span></Link>
+                        <Link to={'/'}> <span className="h4 mb-0 fw-bold"></span></Link>
                     </a>
                     <div className="card shadow-sm w-100" style={{ maxWidth: '400px' }}>
                         <div className="card-body p-4">
